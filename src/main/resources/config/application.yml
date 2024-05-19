@@ -209,4 +209,8 @@ jhipster:
 # https://www.jhipster.tech/common-application-properties/
 # ===================================================================
 
-# application:
+application:
+  api:
+    nytimes:
+      key: heAhyfisnHARlWMVPIHgSgzpr8UhsHXZ
+      baseurl: https://api.nytimes.com/svc/books/v3
