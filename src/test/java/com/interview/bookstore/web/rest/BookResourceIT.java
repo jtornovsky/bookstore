@@ -1,6 +1,7 @@
 package com.interview.bookstore.web.rest;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.Matchers.hasItem;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -44,6 +45,7 @@ class BookResourceIT {
 
     private static final Float DEFAULT_PRICE = 0F;
     private static final Float UPDATED_PRICE = 1F;
+    private static final Float CHEAP_PRICE = 20F;
 
     private static final String ENTITY_API_URL = "/api/books";
     private static final String ENTITY_API_URL_ID = ENTITY_API_URL + "/{id}";
@@ -457,5 +459,32 @@ class BookResourceIT {
         // Validate the database contains one less item
         List<Book> bookList = bookRepository.findAll();
         assertThat(bookList).hasSize(databaseSizeBeforeDelete - 1);
+    }
+
+    @Test
+    @Transactional
+    void getCheapBooks() throws Exception {
+        float cheapPrice = DEFAULT_PRICE;
+
+        // Initialize the database with some books
+        Book cheapBook1 = createEntity(em);
+        cheapBook1.setPrice(CHEAP_PRICE / 2);
+        Book cheapBook2 = createEntity(em);
+        cheapBook2.setPrice(CHEAP_PRICE);
+        Book expensiveBook = createEntity(em);
+        expensiveBook.setPrice(CHEAP_PRICE * 2);
+
+        bookRepository.saveAndFlush(cheapBook1);
+        bookRepository.saveAndFlush(cheapBook2);
+        bookRepository.saveAndFlush(expensiveBook);
+
+        // Get all books cheaper than or equal to 20
+        restBookMockMvc
+            .perform(get("/api/books/cheap?price=" + CHEAP_PRICE).contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+            .andExpect(jsonPath("$.[*].id").value(hasItem(cheapBook1.getId().intValue())))
+            .andExpect(jsonPath("$.[*].id").value(hasItem(cheapBook2.getId().intValue())))
+            .andExpect(jsonPath("$.[*].id", not(hasItem(expensiveBook.getId().intValue()))));
     }
 }

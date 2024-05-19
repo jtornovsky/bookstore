@@ -160,6 +160,23 @@ public class BookResource {
     }
 
     /**
+     * {@code GET  /books/cheap} : get all the books cheaper than a given price.
+     *
+     * @param price the price threshold.
+     * @param pageable the pagination information.
+     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of books in body.
+     */
+    @GetMapping("/books/cheap")
+    public ResponseEntity<List<Book>> getCheapBooks(
+        @RequestParam Float price,
+        @org.springdoc.api.annotations.ParameterObject Pageable pageable
+    ) {
+        Page<Book> page = bookService.findBooksCheaperThan(price, pageable);
+        HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(ServletUriComponentsBuilder.fromCurrentRequest(), page);
+        return ResponseEntity.ok().headers(headers).body(page.getContent());
+    }
+
+    /**
      * {@code GET  /books/:id} : get the "id" book.
      *
      * @param id the id of the book to retrieve.

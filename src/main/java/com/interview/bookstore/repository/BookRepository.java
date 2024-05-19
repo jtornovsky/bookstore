@@ -37,4 +37,6 @@ public interface BookRepository extends JpaRepository<Book, Long> {
 
     @Query("select book from Book book left join fetch book.author where book.id =:id")
     Optional<Book> findOneWithToOneRelationships(@Param("id") Long id);
+
+    Page<Book> findByPriceLessThanEqual(Float price, Pageable pageable);
 }

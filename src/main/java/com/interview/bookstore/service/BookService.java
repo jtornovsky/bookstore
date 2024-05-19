@@ -5,6 +5,7 @@ import com.interview.bookstore.repository.BookRepository;
 import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -81,6 +82,12 @@ public class BookService {
     public Page<Book> findAll(Pageable pageable) {
         log.debug("Request to get all Books");
         return bookRepository.findAll(pageable);
+    }
+
+    @Transactional(readOnly = true)
+    @Cacheable("cheapBooks") // reduce the load on the database and improve response times (for frequently accessed data that doesn't change often)
+    public Page<Book> findBooksCheaperThan(Float price, Pageable pageable) {
+        return bookRepository.findByPriceLessThanEqual(price, pageable);
     }
 
     /**
