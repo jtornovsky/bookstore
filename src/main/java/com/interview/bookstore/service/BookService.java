@@ -87,6 +87,7 @@ public class BookService {
     @Transactional(readOnly = true)
     @Cacheable("cheapBooks") // reduce the load on the database and improve response times (for frequently accessed data that doesn't change often)
     public Page<Book> findBooksCheaperThan(Float price, Pageable pageable) {
+        log.debug("Request to get all Books with the price chipper than {}", price);
         return bookRepository.findByPriceLessThanEqual(price, pageable);
     }
 

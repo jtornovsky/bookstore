@@ -29,4 +29,21 @@ public class ReviewResult {
     public void setSummary(String summary) {
         this.summary = summary;
     }
+
+    @Override
+    public String toString() {
+        return (
+            "ReviewResult{" +
+            "book_title='" +
+            book_title +
+            '\'' +
+            ", book_author='" +
+            book_author +
+            '\'' +
+            ", summary='" +
+            summary +
+            '\'' +
+            '}'
+        );
+    }
 }
